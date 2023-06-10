@@ -9,6 +9,13 @@ interface DatesTypes {
   year: string;
 }
 
+interface InputInterface {
+  name: string;
+  placeHolder: string;
+  min: number;
+  max: number;
+}
+
 const AgeApp = () => {
   const date: Date = new Date();
   const actualDay: number = date.getDate();
@@ -131,6 +138,10 @@ const AgeApp = () => {
     let yearInputVerify: boolean =
       inputElement.getAttribute("id") === "yearInput";
 
+    console.log(
+      "why dont work? " + inputElement.getAttribute("id") + dayInputVerify
+    );
+
     displayWarningMessage(inputElement.getAttribute("id"), "");
 
     if (+inputElement.value < 0) {
@@ -158,14 +169,8 @@ const AgeApp = () => {
       }
       inputElement.value = inputElement.value.slice(0, 2);
       if (dayInputVerify) {
-        if (+inputElement.value > maxDays) {
-          inputElement.value = maxDays + "";
-        }
         setInputDate({ ...inputDate, day: inputElement.value });
       } else if (monthInputVerify) {
-        if (+inputElement.value > 12) {
-          inputElement.value = "12";
-        }
         setMaxDays(setMaxD(+inputElement.value, true));
         setInputDate({ ...inputDate, month: inputElement.value });
       }
@@ -187,42 +192,29 @@ const AgeApp = () => {
     }
   };
 
+  const InputDate = (props: InputInterface) => {
+    return (
+      <div className={"inputDate-items"}>
+        <p>{props.name}</p>
+        <input
+          type="number"
+          id={props.name + "Input"}
+          placeholder={props.placeHolder}
+          onChange={(e) => verifyContent(e.target)}
+        />
+        <p className="warning" id={props.name + "Warning"}>
+          {dayWarning}
+        </p>
+      </div>
+    );
+  };
+
   return (
     <div className="ageApp-container">
       <div className="inputDate-container">
-        <p>DAY</p>
-        <p>MONTH</p>
-        <p>YEAR</p>
-        <input
-          type="number"
-          name="day"
-          id="dayInput"
-          placeholder="DD"
-          onChange={(e) => verifyContent(e.target)}
-        />
-        <input
-          type="number"
-          name="month"
-          id="monthInput"
-          placeholder="MM"
-          onChange={(e) => verifyContent(e.target)}
-        />
-        <input
-          type="number"
-          name="year"
-          id="yearInput"
-          placeholder="YYYY"
-          onChange={(e) => verifyContent(e.target)}
-        />
-        <p className="warning" id={"dayWarning"}>
-          {dayWarning}
-        </p>
-        <p className="warning" id={"monthWarning"}>
-          {monthWarning}
-        </p>
-        <p className="warning" id={"yearWarning"}>
-          {yearWarning}
-        </p>
+        <InputDate name="day" placeHolder="DD" min={1} max={maxDays} />
+        <InputDate name="month" placeHolder="MM" min={1} max={12} />
+        <InputDate name="year" placeHolder="YYYY" min={1} max={actualYear} />
       </div>
       <div className="btn-container">
         <div className="line"></div>

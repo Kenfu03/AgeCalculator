@@ -13,56 +13,52 @@
 }
 
 .inputDate-container{
-    display: grid;
-    width: 100%;
-    justify-items: start;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 20px 50px 20px;
+    display: flex;
+    align-content: center;
+    justify-content: space-between;
+    gap: 10px;
+    
 }
 
-.inputDate-container p{
+.inputDate-items {
+    display: flex;
+    flex-direction: column;
+    width: 33%;
+
+}
+
+.inputDate-items p{
     margin: 0;
     padding-bottom: 5px;
     color: var(--dark-gray);
     letter-spacing: 3px;
     font-size: 12px;
+    text-transform: uppercase;
 }
 
-.inputDate-container input{
+.inputDate-items input{
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
     font-size: 22px;
-    width: 60%;
+    width: 62px;
     height: 40px;
     border: 1px solid;
     border-color: var(--light-gray);
     border-radius: 6px;
     padding: 5px 15px;
+
 }
 
-.inputDate-container input:hover{
+.inputDate-items input:hover{
     border-color: var(--principal-color);
 }
 
-.inputDate-container .warning{
+.inputDate-items .warning{
     margin-top: 10px;
-    font-size: 10px;
-    color: var(--secundary-color);
-}
-
-.inputDate-container #dayWarning {
-    grid-column-start: -4;
-    grid-column-end: -3;
-
-}
-.inputDate-container #monthWarning {
-    grid-column-start: -3;
-    grid-column-end: -2;
-}
-
-.inputDate-container #yearWarning {
-    grid-column-start: -2;
-    grid-column-end: -1;
+    font-size: 8px;
+    color: var(--error-color);
+    width: 60%;
+    flex-grow: 2;
 }
 
 .btn-container{
