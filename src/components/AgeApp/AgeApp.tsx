@@ -12,8 +12,7 @@ interface DatesTypes {
 interface InputInterface {
   name: string;
   placeHolder: string;
-  min: number;
-  max: number;
+  value: any;
 }
 
 const AgeApp = () => {
@@ -25,6 +24,7 @@ const AgeApp = () => {
   const [dayWarning, setDayWarning] = useState<string>("");
   const [monthWarning, setMonthWarning] = useState<string>("");
   const [yearWarning, setYearWarning] = useState<string>("");
+  const [inputDateDay, setInputDateDay] = useState<string>("");
   const [inputDate, setInputDate] = useState<DatesTypes>({
     day: "",
     month: "",
@@ -99,9 +99,9 @@ const AgeApp = () => {
     if (checkNoEmpty() && maxDays >= +inputDate.day) {
       displayWarningMessage("dayInput", "");
       setResultDate({
-        day: dayResult() + "",
-        month: monthResult() + "",
-        year: differenceInYears(actualDate, dateGived) + "",
+        day: dayResult().toString(),
+        month: monthResult().toString(),
+        year: differenceInYears(actualDate, dateGived).toString(),
       });
     } else {
       if (maxDays < +inputDate.day) {
@@ -130,6 +130,11 @@ const AgeApp = () => {
     }
   };
 
+  const verifyDay = (inputElement: HTMLInputElement): void => {
+    const newValue = inputElement.value.replace(/\D/g, "");
+    setInputDateDay(newValue);
+  };
+
   const verifyContent = (inputElement: HTMLInputElement): void => {
     let dayInputVerify: boolean =
       inputElement.getAttribute("id") === "dayInput";
@@ -138,58 +143,25 @@ const AgeApp = () => {
     let yearInputVerify: boolean =
       inputElement.getAttribute("id") === "yearInput";
 
-    console.log(
-      "why dont work? " + inputElement.getAttribute("id") + dayInputVerify
-    );
+    const newValue = inputElement.value.replace(/\D/g, "");
 
-    displayWarningMessage(inputElement.getAttribute("id"), "");
-
-    if (+inputElement.value < 0) {
-      inputElement.value = "";
-      displayWarningMessage(
-        inputElement.getAttribute("id"),
-        "This field is required"
-      );
+    if (dayInputVerify) {
+      setInputDateDay(newValue);
+      // (maxDays < +inputDate.day) ?? console.log("numero invalido")
     }
-    if (dayInputVerify || monthInputVerify) {
-      if (inputElement.value.length === 1) {
-        if (inputElement.value[0] !== "0") {
-          inputElement.value = "0" + inputElement.value;
-        } else {
-          inputElement.value = "";
-          displayWarningMessage(
-            inputElement.getAttribute("id"),
-            "This field is required"
-          );
-        }
-      } else {
-        if (inputElement.value[0] === "0") {
-          inputElement.value = inputElement.value[1] + inputElement.value[2];
-        }
-      }
-      inputElement.value = inputElement.value.slice(0, 2);
-      if (dayInputVerify) {
-        setInputDate({ ...inputDate, day: inputElement.value });
-      } else if (monthInputVerify) {
-        setMaxDays(setMaxD(+inputElement.value, true));
-        setInputDate({ ...inputDate, month: inputElement.value });
-      }
-    } else if (yearInputVerify) {
-      inputElement.value = inputElement.value.slice(0, 4);
-      if (inputElement.value === "") {
-        displayWarningMessage(
-          inputElement.getAttribute("id"),
-          "This field is required"
-        );
-      }
-      if (+inputElement.value > actualYear) {
-        inputElement.value = actualYear + "";
-      }
-      setInputDate({ ...inputDate, year: inputElement.value });
-    }
-    if (maxDays < +inputDate.day) {
-      displayWarningMessage("dayInput", "Need to be a valid day");
-    }
+    // if (monthInputVerify) {
+    //   setMaxDays(setMaxD(+inputElement.value, true));
+    //   setInputDate({ ...inputDate, month: inputElement.value });
+    // }
+    // if (yearInputVerify) {
+    //   inputElement.value = inputElement.value.slice(0, 4);
+    //   if (+inputElement.value > actualYear) {
+    //     inputElement.value = actualYear + "";
+    //   }
+    //   setInputDate({ ...inputDate, year: inputElement.value });
+    // }
+    // if (inputElement.value === "") {
+    // }
   };
 
   const InputDate = (props: InputInterface) => {
@@ -197,10 +169,18 @@ const AgeApp = () => {
       <div className={"inputDate-items"}>
         <p>{props.name}</p>
         <input
-          type="number"
+          type="text"
           id={props.name + "Input"}
           placeholder={props.placeHolder}
-          onChange={(e) => verifyContent(e.target)}
+          value={props.value}
+          onChange={(e) =>
+            props.name === "day"
+              ? verifyDay(e.target)
+              : props.name === "month"
+              ? verifyDay(e.target)
+              : verifyDay(e.target)
+          }
+          maxLength={props.name === "year" ? 4 : 2}
         />
         <p className="warning" id={props.name + "Warning"}>
           {dayWarning}
@@ -212,9 +192,9 @@ const AgeApp = () => {
   return (
     <div className="ageApp-container">
       <div className="inputDate-container">
-        <InputDate name="day" placeHolder="DD" min={1} max={maxDays} />
-        <InputDate name="month" placeHolder="MM" min={1} max={12} />
-        <InputDate name="year" placeHolder="YYYY" min={1} max={actualYear} />
+        <InputDate name="day" placeHolder="DD" value={inputDateDay} />
+        <InputDate name="month" placeHolder="MM" value={inputDateDay} />
+        <InputDate name="year" placeHolder="YYYY" value={inputDateDay} />
       </div>
       <div className="btn-container">
         <div className="line"></div>
@@ -224,7 +204,7 @@ const AgeApp = () => {
       </div>
       <div className="resultDate-container">
         <h1 className="years">
-          <p>{resultDate.year === "" ? "- -" : resultDate.year}</p> years
+          <p>{inputDateDay === "" ? "- -" : inputDateDay}</p> years
         </h1>
         <h1 className="months">
           <p>{resultDate.month === "" ? "- -" : resultDate.month}</p> months
