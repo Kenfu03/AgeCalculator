@@ -1,4 +1,4 @@
-import AgeApp from "./components/AgeApp/AgeApp";
+import AgeApp2 from "./components/AgeApp/AgeApp2";
 import "./App.css";
 
 function App() {
@@ -6,7 +6,7 @@ function App() {
     <div className="principal-container">
       <header>navbar</header>
       <main>
-        <AgeApp />
+        <AgeApp2 />
       </main>
       <footer>
         Challenge by{" "}
