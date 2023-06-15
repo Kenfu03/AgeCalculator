@@ -9,7 +9,7 @@
     width: auto;
     max-width: 400px;
     padding: 1.5rem;
-    border-radius: 15px 15px 120px 15px;
+    border-radius: 20px;
 }
 
 .inputDate-container{
@@ -40,7 +40,7 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
     font-size: 22px;
-    width: 62px;
+    width: 64px;
     height: 40px;
     border: 1px solid;
     border-color: var(--light-gray);
@@ -55,18 +55,12 @@
 
 .inputDate-items .warning{
     margin-top: 10px;
-    font-size: 8px;
+    font-size: 10px;
     color: var(--error-color);
-    width: 60%;
-    flex-grow: 2;
-}
-
-.btn-container{
-    display: flex;
-    align-items: center;
-    height: 100px;
     width: 100%;
-    margin-top: 2rem;
+    flex-grow: 2;
+    text-transform: none;
+
 }
 
 .line{
@@ -74,19 +68,7 @@
     height: 2px;
     background-color: hsl(0, 0%, 86%);
     border-radius: 3px;
-}
-
-.btn-container button{
-    background-color: var(--principal-color);
-    border: none;
-    border-radius: 50%;
-    position: absolute;
-    left: 40%;
-}
-
-.btn-container button img{
-    margin: 15px;
-    width: 30px;
+    margin: 30px 0;
 }
 
 .resultDate-container {
@@ -109,3 +91,21 @@
     color: var(--principal-color);
 }
 
+.waiting-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.waiting-container img {
+    width: 50%;
+}
+
+.waiting-container h1 {
+    font-size: 25px;
+}
+
+.waiting-container p {
+    color: var(--dark-gray);
+}

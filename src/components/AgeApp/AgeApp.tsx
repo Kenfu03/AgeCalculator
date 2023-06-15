@@ -189,6 +189,8 @@ const AgeApp = () => {
     );
   };
 
+
+
   return (
     <div className="ageApp-container">
       <div className="inputDate-container">
@@ -201,17 +203,6 @@ const AgeApp = () => {
         <button onClick={() => results()}>
           <img src={btnImage} alt="arrowButton" />
         </button>
-      </div>
-      <div className="resultDate-container">
-        <h1 className="years">
-          <p>{inputDateDay === "" ? "- -" : inputDateDay}</p> years
-        </h1>
-        <h1 className="months">
-          <p>{resultDate.month === "" ? "- -" : resultDate.month}</p> months
-        </h1>
-        <h1 className="days">
-          <p>{resultDate.day === "" ? "- -" : resultDate.day}</p> days
-        </h1>
       </div>
     </div>
   );
