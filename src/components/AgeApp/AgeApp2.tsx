@@ -1,7 +1,7 @@
 import "./AgeApp.css";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import waitingSymbol from "./../../assets/images/waiting-symbol.svg";
-import { differenceInYears } from "date-fns";
+import { differenceInMonths, differenceInYears } from "date-fns";
 
 interface DatesTypes {
   day?: string;
@@ -16,10 +16,10 @@ interface InputInterface {
 }
 
 const AgeApp2 = () => {
-  const date: Date = new Date();
-  const actualDay: number = date.getDate();
-  const actualMonth: number = date.getUTCMonth() + 1;
-  const actualYear: number = date.getFullYear();
+  const actualDate: Date = new Date();
+  const actualDay: number = actualDate.getDate();
+  const actualMonth: number = actualDate.getUTCMonth() + 1;
+  const actualYear: number = actualDate.getFullYear();
   const [inputDay, setInputDay] = useState<string>("");
   const [inputMonth, setInputMonth] = useState<string>("");
   const [inputYear, setInputYear] = useState<string>("");
@@ -28,14 +28,16 @@ const AgeApp2 = () => {
   const [monthWarning, setMonthWarning] = useState<string>("");
   const [yearWarning, setYearWarning] = useState<string>("");
   const [resultDate, setResultDate] = useState<DatesTypes>({});
-  const dayRef = useRef<HTMLInputElement>(null);
-  const monthRef = useRef<HTMLInputElement>(null);
-  const yearRef = useRef<HTMLInputElement>(null);
+
+  const inputInformation: InputInterface[] = [
+    { name: "day", placeHolder: "DD", warning: dayWarning },
+    { name: "month", placeHolder: "MM", warning: monthWarning },
+    { name: "year", placeHolder: "YYYY", warning: yearWarning },
+  ];
 
   useEffect(() => {
-    console.log("cambio algo");
-    results();
-  }, [inputDay, inputMonth, inputYear, maxDays]);
+    checkNoEmpty() && results();
+  }, [maxDays, inputDay, inputMonth, inputYear]);
 
   const isLeapYear = (year: number): boolean => {
     return year !== 0 ? (year % 4 === 0 ? true : false) : false;
@@ -57,98 +59,80 @@ const AgeApp2 = () => {
   };
 
   const dayResult = (): number => {
-    if (Number(inputDay) > actualDay) {
-      return actualDay + setMaxD(actualMonth - 1, false) - Number(inputDay);
-    } else {
-      return actualDay - Number(inputDay);
-    }
+    const extraMonth = setMaxD(actualMonth - 1, false);
+    return Number(inputDay) > actualDay
+      ? actualDay + extraMonth - Number(inputDay)
+      : actualDay - Number(inputDay);
   };
 
-  const monthResult = (): number => {
-    let extraYear: number = 0;
-    Number(inputMonth) > actualMonth ? (extraYear = 12) : (extraYear = 0);
-
+  const monthResult = (resMonth: number, resYear: number): number => {
     if (Number(inputMonth) === actualMonth) {
       return 0;
     }
-    return Number(inputDay) > actualDay
-      ? actualMonth + extraYear - (Number(inputMonth) + 1)
-      : actualMonth + extraYear - Number(inputMonth);
+    return Number(inputMonth) > actualMonth
+      ? resMonth - resYear * 12 + 1
+      : resMonth - resYear * 12 + 1;
   };
 
   const results = (): void => {
-    const actualDate: Date = new Date(actualYear, actualMonth, actualDay);
     const dateGived: Date = new Date(
       Number(inputYear),
       Number(inputMonth),
       Number(inputDay)
     );
-    if (checkNoEmpty() && maxDays >= Number(inputDay)) {
+    const resMonth = differenceInMonths(actualDate, dateGived);
+    const resYear = differenceInYears(actualDate, dateGived);
+
+    if (maxDays >= Number(inputDay)) {
       warningMessage("dayInput", "");
       setResultDate({
         day: dayResult().toString(),
-        month: monthResult().toString(),
-        year: differenceInYears(actualDate, dateGived).toString(),
+        month: monthResult(resMonth, resYear).toString(),
+        year: resYear.toString(),
       });
     } else {
-      if (maxDays < Number(inputDay)) {
-        warningMessage("day", "Need to be a valid day");
-      }
+      warningMessage("dayInput", "Need to be a valid day");
+      setInputDay("");
       setResultDate({});
     }
   };
 
   const warningMessage = (inputName: string, warningMsg: string): void => {
-    inputName === "day" && setDayWarning(warningMsg);
-    inputName === "month" && setMonthWarning(warningMsg);
-    inputName === "year" && setYearWarning(warningMsg);
+    inputName === "dayInput" && setDayWarning(warningMsg);
+    inputName === "monthInput" && setMonthWarning(warningMsg);
+    inputName === "yearInput" && setYearWarning(warningMsg);
   };
 
   const setMaxValue = (evalNumber: number, maxNumber: number): string => {
+    if (evalNumber === 0) {
+      return "";
+    }
     return evalNumber > maxNumber
       ? maxNumber.toString()
       : evalNumber.toString();
   };
 
   const verifyContent = (inputElement: ChangeEvent<HTMLInputElement>): void => {
-    const inputName = inputElement.target.id;
-    let newValue = inputElement.target.value;
-    newValue = newValue.replace(/\D/g, "");
+    const inputID = inputElement.target.id;
+    inputElement.target.value = inputElement.target.value.replace(/\D/g, "");
+    const newValue = inputElement.target.value;
 
-    // inputElement.value === "" && warningMessage(inputName, "Can`t be empty");
-    // inputElement.value !== "" && warningMessage(inputName, "");
-    // setMaxDays(setMaxD(Number(inputMonth), true));
+    newValue === "" && warningMessage(inputID, "Can`t be empty");
+    newValue !== "" && warningMessage(inputID, "");
+    setMaxDays(setMaxD(Number(inputMonth), true));
 
-    if (inputName === "dayInput") {
-      newValue = setMaxValue(Number(newValue), maxDays);
-      setInputDay(newValue);
+    if (inputID === "dayInput") {
+      inputElement.target.value = setMaxValue(Number(newValue), maxDays);
+      setInputDay(inputElement.target.value);
     }
-    if (inputName === "monthInput") {
-      newValue = setMaxValue(Number(newValue), 12);
-      setInputMonth(newValue);
+    if (inputID === "monthInput") {
+      inputElement.target.value = setMaxValue(Number(newValue), 12);
+      setInputMonth(inputElement.target.value);
     }
-    if (inputName === "yearInput") {
-      newValue = setMaxValue(Number(newValue), actualYear);
-      setInputYear(newValue);
+    if (inputID === "yearInput") {
+      inputElement.target.value = setMaxValue(Number(newValue), actualYear);
+      setInputYear(inputElement.target.value);
     }
-  };
-
-  const InputDate = (props: InputInterface) => {
-    return (
-      <div className={"inputDate-items"}>
-        <p>{props.name}</p>
-        <input
-          type="text"
-          id={props.name + "Input"}
-          placeholder={props.placeHolder}
-          onChange={(e) => verifyContent(e)}
-          maxLength={props.name === "year" ? 4 : 2}
-        />
-        <p className="warning" id={props.name + "Warning"}>
-          {props.warning}
-        </p>
-      </div>
-    );
   };
 
   const ResultDiv = () => {
@@ -180,13 +164,24 @@ const AgeApp2 = () => {
   return (
     <div className="ageApp-container">
       <div className="inputDate-container">
-        <InputDate name="day" placeHolder="DD" warning={dayWarning} />
-        <InputDate name="month" placeHolder="MM" warning={monthWarning} />
-        <InputDate name="year" placeHolder="YYYY" warning={yearWarning} />
+        {inputInformation.map((input: InputInterface, i: number) => (
+          <div className={"inputDate-items"} key={i}>
+            <p>{input.name}</p>
+            <input
+              type="text"
+              id={input.name + "Input"}
+              placeholder={input.placeHolder}
+              onChange={(e) => verifyContent(e)}
+              maxLength={input.name === "year" ? 4 : 2}
+            />
+            <p className="warning" id={input.name + "Warning"}>
+              {input.warning}
+            </p>
+          </div>
+        ))}
       </div>
       <div className="line"></div>
-      <ResultDiv />
-      {/* {checkNoEmpty() ? <ResultDiv /> : <WaitingDiv />} */}
+      {checkNoEmpty() ? <ResultDiv /> : <WaitingDiv />}
     </div>
   );
 };
