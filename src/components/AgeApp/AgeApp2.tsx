@@ -1,5 +1,5 @@
 import "./AgeApp.css";
-import { LegacyRef, RefObject, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import waitingSymbol from "./../../assets/images/waiting-symbol.svg";
 import { differenceInYears } from "date-fns";
 
@@ -13,7 +13,6 @@ interface InputInterface {
   name: string;
   placeHolder: string;
   warning: string;
-  // ref: RefObject<HTMLInputElement>;
 }
 
 const AgeApp2 = () => {
@@ -34,11 +33,9 @@ const AgeApp2 = () => {
   const yearRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    console.log("cambio algo")
+    console.log("cambio algo");
     results();
-  
-  }, [inputDay, inputMonth, inputYear, maxDays])
-  
+  }, [inputDay, inputMonth, inputYear, maxDays]);
 
   const isLeapYear = (year: number): boolean => {
     return year !== 0 ? (year % 4 === 0 ? true : false) : false;
@@ -113,30 +110,27 @@ const AgeApp2 = () => {
       : evalNumber.toString();
   };
 
-  const verifyContent = (
-    inputElement: HTMLInputElement,
-    inputName: string,
-    inputRef: RefObject<HTMLInputElement>
-  ): void => {
-    inputElement.value = inputElement.value.replace(/\D/g, "");
+  const verifyContent = (inputElement: ChangeEvent<HTMLInputElement>): void => {
+    const inputName = inputElement.target.id;
+    let newValue = inputElement.target.value;
+    newValue = newValue.replace(/\D/g, "");
 
     // inputElement.value === "" && warningMessage(inputName, "Can`t be empty");
     // inputElement.value !== "" && warningMessage(inputName, "");
     // setMaxDays(setMaxD(Number(inputMonth), true));
 
-    if (inputName === "day") {
-      inputElement.value = setMaxValue(Number(inputElement.value), maxDays);
-      setInputDay(inputElement.value);
+    if (inputName === "dayInput") {
+      newValue = setMaxValue(Number(newValue), maxDays);
+      setInputDay(newValue);
     }
-    if (inputName === "month") {
-      inputElement.value = setMaxValue(Number(inputElement.value), 12);
-      setInputMonth(inputElement.value);
+    if (inputName === "monthInput") {
+      newValue = setMaxValue(Number(newValue), 12);
+      setInputMonth(newValue);
     }
-    if (inputName === "year") {
-      inputElement.value = setMaxValue(Number(inputElement.value), actualYear);
-      setInputYear(inputElement.value);
+    if (inputName === "yearInput") {
+      newValue = setMaxValue(Number(newValue), actualYear);
+      setInputYear(newValue);
     }
-    inputRef.current?.focus();
   };
 
   const InputDate = (props: InputInterface) => {
@@ -147,7 +141,7 @@ const AgeApp2 = () => {
           type="text"
           id={props.name + "Input"}
           placeholder={props.placeHolder}
-          onChange={(e) => verifyContent(e.target, props.name, props.ref)}
+          onChange={(e) => verifyContent(e)}
           maxLength={props.name === "year" ? 4 : 2}
         />
         <p className="warning" id={props.name + "Warning"}>
@@ -186,9 +180,9 @@ const AgeApp2 = () => {
   return (
     <div className="ageApp-container">
       <div className="inputDate-container">
-        <InputDate name="day" placeHolder="DD" warning={dayWarning} ref={dayRef}/>
-        <InputDate name="month" placeHolder="MM" warning={monthWarning} ref={monthRef}/>
-        <InputDate name="year" placeHolder="YYYY" warning={yearWarning} ref={yearRef}/>
+        <InputDate name="day" placeHolder="DD" warning={dayWarning} />
+        <InputDate name="month" placeHolder="MM" warning={monthWarning} />
+        <InputDate name="year" placeHolder="YYYY" warning={yearWarning} />
       </div>
       <div className="line"></div>
       <ResultDiv />
