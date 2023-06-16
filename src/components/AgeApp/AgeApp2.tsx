@@ -1,5 +1,5 @@
 import "./AgeApp.css";
-import { useState } from "react";
+import { LegacyRef, RefObject, useEffect, useRef, useState } from "react";
 import waitingSymbol from "./../../assets/images/waiting-symbol.svg";
 import { differenceInYears } from "date-fns";
 
@@ -13,6 +13,7 @@ interface InputInterface {
   name: string;
   placeHolder: string;
   warning: string;
+  // ref: RefObject<HTMLInputElement>;
 }
 
 const AgeApp2 = () => {
@@ -20,28 +21,38 @@ const AgeApp2 = () => {
   const actualDay: number = date.getDate();
   const actualMonth: number = date.getUTCMonth() + 1;
   const actualYear: number = date.getFullYear();
-  const [maxDays, setMaxDays] = useState<number>(31);
   const [inputDay, setInputDay] = useState<string>("");
   const [inputMonth, setInputMonth] = useState<string>("");
   const [inputYear, setInputYear] = useState<string>("");
+  const [maxDays, setMaxDays] = useState<number>(31);
   const [dayWarning, setDayWarning] = useState<string>("");
   const [monthWarning, setMonthWarning] = useState<string>("");
   const [yearWarning, setYearWarning] = useState<string>("");
   const [resultDate, setResultDate] = useState<DatesTypes>({});
+  const dayRef = useRef<HTMLInputElement>(null);
+  const monthRef = useRef<HTMLInputElement>(null);
+  const yearRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    console.log("cambio algo")
+    results();
+  
+  }, [inputDay, inputMonth, inputYear, maxDays])
+  
 
   const isLeapYear = (year: number): boolean => {
-    return year !== 0 ? year % 4 === 0 ? true : false : false;
+    return year !== 0 ? (year % 4 === 0 ? true : false) : false;
   };
 
   const isPair = (number: number): boolean => {
-    return number % 2 === 0 ? true : false
-  }
+    return number % 2 === 0 ? true : false;
+  };
 
   const setMaxD = (month: number, forInput: boolean): number => {
     if (month === 2) {
       return isLeapYear(forInput ? Number(inputYear) : actualYear) ? 29 : 28;
-    } 
-    return month <= 7 ? isPair(month) ? 30 : 31 : isPair(month) ? 31 : 30;
+    }
+    return month <= 7 ? (isPair(month) ? 30 : 31) : isPair(month) ? 31 : 30;
   };
 
   const checkNoEmpty = (): boolean => {
@@ -84,7 +95,7 @@ const AgeApp2 = () => {
       });
     } else {
       if (maxDays < Number(inputDay)) {
-        warningMessage("dayInput", "Need to be a valid day");
+        warningMessage("day", "Need to be a valid day");
       }
       setResultDate({});
     }
@@ -104,12 +115,15 @@ const AgeApp2 = () => {
 
   const verifyContent = (
     inputElement: HTMLInputElement,
-    inputName: string
+    inputName: string,
+    inputRef: RefObject<HTMLInputElement>
   ): void => {
     inputElement.value = inputElement.value.replace(/\D/g, "");
 
-    inputElement.value === "" && warningMessage(inputName, "Can`t be empty");
-    setMaxDays(setMaxD(Number(inputMonth), true));
+    // inputElement.value === "" && warningMessage(inputName, "Can`t be empty");
+    // inputElement.value !== "" && warningMessage(inputName, "");
+    // setMaxDays(setMaxD(Number(inputMonth), true));
+
     if (inputName === "day") {
       inputElement.value = setMaxValue(Number(inputElement.value), maxDays);
       setInputDay(inputElement.value);
@@ -122,6 +136,7 @@ const AgeApp2 = () => {
       inputElement.value = setMaxValue(Number(inputElement.value), actualYear);
       setInputYear(inputElement.value);
     }
+    inputRef.current?.focus();
   };
 
   const InputDate = (props: InputInterface) => {
@@ -132,7 +147,7 @@ const AgeApp2 = () => {
           type="text"
           id={props.name + "Input"}
           placeholder={props.placeHolder}
-          onChange={(e) => verifyContent(e.target, props.name)}
+          onChange={(e) => verifyContent(e.target, props.name, props.ref)}
           maxLength={props.name === "year" ? 4 : 2}
         />
         <p className="warning" id={props.name + "Warning"}>
@@ -171,9 +186,9 @@ const AgeApp2 = () => {
   return (
     <div className="ageApp-container">
       <div className="inputDate-container">
-        <InputDate name="day" placeHolder="DD" warning={dayWarning} />
-        <InputDate name="month" placeHolder="MM" warning={monthWarning} />
-        <InputDate name="year" placeHolder="YYYY" warning={yearWarning} />
+        <InputDate name="day" placeHolder="DD" warning={dayWarning} ref={dayRef}/>
+        <InputDate name="month" placeHolder="MM" warning={monthWarning} ref={monthRef}/>
+        <InputDate name="year" placeHolder="YYYY" warning={yearWarning} ref={yearRef}/>
       </div>
       <div className="line"></div>
       <ResultDiv />
